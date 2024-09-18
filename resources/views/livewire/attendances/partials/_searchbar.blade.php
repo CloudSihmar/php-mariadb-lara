@@ -1,0 +1,86 @@
+<div class="w-full bg-gray-100 p-2 my-4 rounded shadow">
+  <div class="flex w-full flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row gap-2 w-full">
+      <!-- Profile Status Update -->
+      <div class="flex flex-row items-center gap-2 w-full">
+        <div class="w-full">
+            <select name="userstatus_id" class="form-control w-96" wire:model="userstatus_id">
+            <option value=''>Select Status</option>
+            @foreach($attendancestatusList as $item)
+            <option value="{{$item->id}}">{{$item->name}}</option>
+            @endforeach
+            </select>
+        </div>
+        <div class="my-1">
+          <x-jet-button class="rounded bg-green-500 hover:bg-green-700 text-xs" wire:click="updateStatus" wire:loading.attr="disabled">
+            {{ __('Update') }}
+          </x-jet-button>
+        </div>
+      </div>
+
+      <!-- Division -->
+      <div class="flex flex-grow items-center flex-row gap-2 w-full">
+
+      
+          <div class="w-full my-2">
+            <select name="division_id" class="form-control" wire:model.defer="division_id">
+              <option value=''>Select Division</option>
+              @foreach($divisions as $item)
+             
+              <option value="{{$item->id}}">{{$item->name}}</option>
+          
+              @endforeach
+              <option value="0">All</option>
+            </select>
+            <x-jet-input-error for="division_id" class="mt-2" />
+          </div>
+       
+          
+      </div>
+      
+        <div class="flex items-center flex-row gap-2 w-full">
+          <x-jet-button class="rounded bg-green-500 hover:bg-green-700 text-xs" wire:click="searchMember" wire:loading.attr="disabled">
+            <i class="fa fa-search fa-lg mr-1 hidden md:block"></i> {{ __('Search') }}
+          </x-jet-button>
+          
+<!--          <a href="{{ route('app.pdf.member-attendance-report.report')}}" class="flex items-center py-2 px-4 text-white rounded bg-red-600 hover:bg-red-500 text-xs uppercase font-bold" target="_blank">
+              <i class="fa fa-file-pdf fa-lg mr-2"></i> {{ __('Export') }}
+          </a>-->
+
+        
+     
+ 
+    </div> 
+      <!-- Report for NA/NC-->
+      <div class="flex flex-row justify-between gap-2 w-full md:w-6/12">
+          @if(Auth::user()->id !=1)
+            @if($leaveButton == 0)
+              @if($this->resultCount == 0)
+                  <x-jet-button wire:click="$toggle('confirmItemAdd')" class="bg-blue-500 hover:bg-blue-700">
+                    <i class="fa fa-fingerprint fa-lg mr-1"></i>
+                    CheckIn
+                  </x-jet-button>
+              @else
+                @if($this->attendanceStatus == 0)
+                  <x-jet-button class="bg-orange-500 hover:bg-orange-700">
+                    You have already checkout for the day...
+                  </x-jet-button>
+                @else
+                  <x-jet-button wire:click="$toggle('checkoutFormModal')" class="bg-orange-500 hover:bg-orange-700">
+                    CheckOut
+                  </x-jet-button>
+                @endif
+              @endif
+            @endif
+          @endif
+
+           @can(['secretariat.dailyattendancereport'])
+          <a class="flex rounded p-2 uppercase text-xs font-bold text-gray-50 bg-sky-600 hover:bg-sky-700" href="{{ route('app.report.attendancereport.applications',10)}}">
+            <i class="fa fa-book-open mr-2"></i>
+            Daily&nbsp;Attendance&nbsp;Report
+          </a>
+          @endcan
+      </div>
+
+    </div>  
+  </div>
