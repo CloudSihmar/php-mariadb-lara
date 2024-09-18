@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('git-clone') {
+            steps {
+                git 'https://github.com/CloudSihmar/php-app.git'
+            }
+        }
+        
+        // SAST starts here
+        stage('Static code analysis') {
+            environment {
+               SCANNER_HOME = tool 'sonarscanner'
+             }
+        steps {
+          withSonarQubeEnv('sonarqube-server') {
+         sh """/opt/sonar-scanner/bin/sonar-scanner \\
+                -Dsonar.projectKey=php-project3 \\
+                -Dsonar.projectName=php-project3 \\
+                -Dsonar.projectVersion=${BUILD_NUMBER} \\
+                -Dsonar.sources=.
+            """
+            }
+            }
+        }
+      // SAST ends here 
+      
+      // Quality Gate stage starts (abortPipeline if true then build will fail if doent meet the criteria)
+       stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: true, credentialsId: 'sonar-token' 
+                }
+            } 
+        }   
+       // Quality Gate ends
+    }
+}
