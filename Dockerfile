@@ -107,7 +107,6 @@ RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
 # change current user to www
 USER www-data
-RUN php artisan migrate
 
 EXPOSE 9000
 CMD ["php-fpm"]
