@@ -1,0 +1,74 @@
+version: '3.7'
+
+services:
+  # PHP-FPM - Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: app
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www
+
+    volumes:
+      - ./:/var/www
+      - ./docker-files/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+
+    networks:
+      - app
+
+  # NGINX - Service
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+
+    ports:
+      - "8100:80"
+      - "8143:443"
+
+    volumes:
+      - ./:/var/www
+      - ./docker-files/nginx/conf.d/:/etc/nginx/conf.d/
+
+    networks:
+      - app
+
+  # MariaDB - Service
+  db:
+    image: mariadb:10.5.6
+    container_name: db
+    restart: unless-stopped
+    tty: true
+
+    ports:
+      - "3306:3306"
+
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: prms
+      MYSQL_USER: prms_user
+      MYSQL_PASSWORD: Wsx22zaq@1243
+
+    volumes:
+      - mariadbdata:/var/lib/mysql
+      - ./docker-files/mysql/my.cnf:/etc/mysql/my.cnf
+      - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql
+      - ./govact.sql:/docker-entrypoint-initdb.d/govact.sql
+
+
+    networks:
+      - app
+
+# Volumes
+volumes:
+  mariadbdata:
+    driver: local
+
+# Networks
+networks:
+  app:
+    driver: bridge
