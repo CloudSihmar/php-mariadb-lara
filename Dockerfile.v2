@@ -1,0 +1,16 @@
+FROM nginx:alpine
+
+# Check if the www-data group exists; if not, create it
+RUN getent group www-data || addgroup -g 33 www-data
+
+# Check if the www-data user exists; if not, create it
+RUN getent passwd www-data || adduser -u 33 -G www-data -D www-data
+
+# Copy files with correct ownership
+COPY --chown=www-data:www-data . /var/www
+
+# Ensure permissions
+RUN chmod -R 755 /var/www
+
+# Expose port
+EXPOSE 80
