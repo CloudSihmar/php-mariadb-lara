@@ -48,16 +48,16 @@ COPY . /var/www
 # Copy existing permissions from folder to docker
 COPY --chown=www-data:www-data . /var/www
 RUN chown -R www-data:www-data /var/www
-RUN sudo chmod -R 755 /var/www
+RUN chmod -R 755 /var/www
 
 
 # Set permissions for storage and cache directories
 RUN mkdir -p /var/www/storage /var/www/bootstrap/cache 
-RUN sudo chown -R www-data:www-data /var/www/storage
-RUN sudo chmod -R 755 /var/www/storage
+RUN chown -R www-data:www-data /var/www/storage
+RUN chmod -R 755 /var/www/storage
 
-RUN sudo chown -R www-data:www-data /var/www/bootstrap/cache
-RUN sudo chmod -R 755 /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/bootstrap/cache
+RUN chmod -R 755 /var/www/bootstrap/cache
 
 
 # change current user to www
