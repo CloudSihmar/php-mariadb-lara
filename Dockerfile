@@ -49,6 +49,11 @@ COPY . /var/www
 COPY --chown=www-data:www-data . /var/www
 RUN chown -R www-data:www-data /var/www
 
+# Set permissions for storage and cache directories
+RUN mkdir -p /var/www/storage /var/www/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
 # change current user to www
 USER www-data
 
