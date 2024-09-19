@@ -18,48 +18,32 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    libonig-dev
+    libonig-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring zip exif && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install gd
 
-# Install extensions
-RUN docker-php-ext-install pdo_mysql mbstring zip exif
-
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install gd
-
-#RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-png
-#RUN docker-php-ext-install gd
-
-#RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
-#RUN docker-php-ext-install gd
-
-# Install composer
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Add user for laravel
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+# Add user for Laravel
+RUN groupadd -g 1000 www && \
+    useradd -u 1000 -ms /bin/bash -g www www
 
-# Copy application folder
+# Copy application files
 COPY . /var/www
 
-# Copy existing permissions from folder to docker
-#COPY --chown=www-data:www-data . /var/www
-#RUN chown -R www-data:www-data /var/www 
-RUN chown -R www-data:www-data .
+# Set permissions
+RUN chown -R www:www /var/www && \
+    mkdir -p /var/www/storage /var/www/bootstrap/cache && \
+    chown -R www:www /var/www/storage /var/www/bootstrap/cache && \
+    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Set specific permissions for storage and bootstrap/cache directories
-# Ensure storage and bootstrap/cache directories have the correct permissions
-RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html/storage
-RUN chmod -R 775 /var/www/html/storage
-RUN chown -R www-data:www-data /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/bootstrap/cache
-
-# change current user to www
-USER www-data
+# Switch to non-root user
+USER www
 
 EXPOSE 9000
 CMD ["php-fpm"]
