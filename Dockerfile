@@ -51,12 +51,13 @@ COPY . /var/www
 RUN chown -R www-data:www-data .
 
 # Set specific permissions for storage and bootstrap/cache directories
+# Ensure storage and bootstrap/cache directories have the correct permissions
+RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage
+RUN chmod -R 775 /var/www/html/storage
+RUN chown -R www-data:www-data /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/bootstrap/cache
 
-RUN chown -R www-data:www-data /var/www/storage
-RUN chmod -R 755 /var/www/storage
-
-RUN chown -R www-data:www-data /var/www/bootstrap/cache
-RUN chmod -R 755 /var/www/bootstrap/cache
 # change current user to www
 USER www-data
 
